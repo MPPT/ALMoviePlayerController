@@ -393,6 +393,15 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)playPausePressed:(UIButton *)button {
+    {
+      // reset fast forward states
+      if (self.seekForwardButton.selected) {
+          [self.seekForwardButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+      }
+      if (self.seekBackwardButton.selected) {
+          [self.seekBackwardButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+      }
+    }
     self.moviePlayer.playbackState == MPMoviePlaybackStatePlaying ? [self.moviePlayer pause] : [self.moviePlayer play];
     [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
 }

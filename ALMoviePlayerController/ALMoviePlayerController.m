@@ -37,7 +37,7 @@
 
 @end
 
-static const CGFloat movieBackgroundPadding = 20.f; //if we don't pad the movie's background view, the edges will appear jagged when rotating
+static const CGFloat movieBackgroundPadding = 0.f; //if we don't pad the movie's background view, the edges will appear jagged when rotating
 static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 
 @interface ALMoviePlayerController ()
@@ -71,7 +71,6 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
         
         if (!_movieBackgroundView) {
             _movieBackgroundView = [[UIView alloc] init];
-            _movieBackgroundView.alpha = 0.f;
             [_movieBackgroundView setBackgroundColor:[UIColor blackColor]];
         }
     }
@@ -133,42 +132,29 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
         if (!keyWindow) {
             keyWindow = [[[UIApplication sharedApplication] windows] objectAtIndex:0];
         }
-        if (CGRectEqualToRect(self.movieBackgroundView.frame, CGRectZero)) {
-            [self.movieBackgroundView setFrame:keyWindow.bounds];
-        }
+        [self.movieBackgroundView setFrame:keyWindow.bounds];
         [keyWindow addSubview:self.movieBackgroundView];
-        [UIView animateWithDuration:animated ? fullscreenAnimationDuration : 0.0 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-            self.movieBackgroundView.alpha = 1.f;
-        } completion:^(BOOL finished) {
-            self.view.alpha = 0.f;
-            [self.movieBackgroundView addSubview:self.view];
-            UIInterfaceOrientation currentOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-            [self rotateMoviePlayerForOrientation:currentOrientation animated:NO completion:^{
-                [UIView animateWithDuration:animated ? fullscreenAnimationDuration : 0.0 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-                    self.view.alpha = 1.f;
-                } completion:^(BOOL finished) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:MPMoviePlayerDidEnterFullscreenNotification object:nil];
-                    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(statusBarOrientationWillChange:) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
-                }];
-            }];
+        [self.movieBackgroundView addSubview:self.view];
+        self.movieBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0];
+        [UIView animateWithDuration:fullscreenAnimationDuration animations:^{
+            self.movieBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
         }];
-        
+        UIInterfaceOrientation currentOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        [self rotateMoviePlayerForOrientation:currentOrientation animated:NO movieFrameAnimated:YES completion:^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:MPMoviePlayerDidEnterFullscreenNotification object:nil];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(statusBarOrientationWillChange:) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
+        }];
     } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:MPMoviePlayerWillExitFullscreenNotification object:nil];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
+        if ([self.delegate respondsToSelector:@selector(moviePlayerWillMoveFromWindow)]) {
+            [self.delegate moviePlayerWillMoveFromWindow];
+        }
         [UIView animateWithDuration:animated ? fullscreenAnimationDuration : 0.0 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-            self.view.alpha = 0.f;
+            self.movieBackgroundView.backgroundColor = [UIColor colorWithWhite:0 alpha:0];
         } completion:^(BOOL finished) {
-            if ([self.delegate respondsToSelector:@selector(moviePlayerWillMoveFromWindow)]) {
-                [self.delegate moviePlayerWillMoveFromWindow];
-            }
-            self.view.alpha = 1.f;
-            [UIView animateWithDuration:animated ? fullscreenAnimationDuration : 0.0 delay:0.0 options:UIViewAnimationOptionCurveLinear animations:^{
-                self.movieBackgroundView.alpha = 0.f;
-            } completion:^(BOOL finished) {
-                [self.movieBackgroundView removeFromSuperview];
-                [[NSNotificationCenter defaultCenter] postNotificationName:MPMoviePlayerDidExitFullscreenNotification object:nil];
-            }];
+            [self.movieBackgroundView removeFromSuperview];
+            [[NSNotificationCenter defaultCenter] postNotificationName:MPMoviePlayerDidExitFullscreenNotification object:nil];
         }];
     }
 }
@@ -187,10 +173,10 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
 
 - (void)statusBarOrientationWillChange:(NSNotification *)note {
     UIInterfaceOrientation orientation = (UIInterfaceOrientation)[[[note userInfo] objectForKey:UIApplicationStatusBarOrientationUserInfoKey] integerValue];
-    [self rotateMoviePlayerForOrientation:orientation animated:YES completion:nil];
+    [self rotateMoviePlayerForOrientation:orientation animated:YES movieFrameAnimated:YES completion:nil];
 }
 
-- (void)rotateMoviePlayerForOrientation:(UIInterfaceOrientation)orientation animated:(BOOL)animated completion:(void (^)(void))completion {
+- (void)rotateMoviePlayerForOrientation:(UIInterfaceOrientation)orientation animated:(BOOL)animated movieFrameAnimated:(BOOL)movieFrameAnimated completion:(void (^)(void))completion {
     CGFloat angle;
     CGSize windowSize = [UIApplication sizeInOrientation:orientation];
     CGRect backgroundFrame;
@@ -218,12 +204,11 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
             movieFrame = CGRectMake(movieBackgroundPadding, movieBackgroundPadding, backgroundFrame.size.width - movieBackgroundPadding*2, backgroundFrame.size.height - movieBackgroundPadding*2);
             break;
     }
-    
+
     if (animated) {
         [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             self.movieBackgroundView.transform = CGAffineTransformMakeRotation(angle);
             self.movieBackgroundView.frame = backgroundFrame;
-            [self setFrame:movieFrame];
         } completion:^(BOOL finished) {
             if (completion)
                 completion();
@@ -231,9 +216,17 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
     } else {
         self.movieBackgroundView.transform = CGAffineTransformMakeRotation(angle);
         self.movieBackgroundView.frame = backgroundFrame;
-        [self setFrame:movieFrame];
         if (completion)
             completion();
+    }
+
+    if (movieFrameAnimated) {
+        [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            [self setFrame:movieFrame];
+        } completion:^(BOOL finished) {
+        }];
+    } else {
+        [self setFrame:movieFrame];
     }
 }
 
@@ -258,5 +251,6 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
         }
     }
 }
+
 
 @end

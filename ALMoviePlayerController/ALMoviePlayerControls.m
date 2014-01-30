@@ -74,7 +74,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     self = [super init];
     if (self) {
         self.backgroundColor = [UIColor clearColor];
-        
+
         _moviePlayer = moviePlayer;
         _style = style;
         _showing = NO;
@@ -242,7 +242,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             _style = style;
             [self setup];
             if (_style != ALMoviePlayerControlsStyleNone) {
-                double delayInSeconds = 0.2;
+                double delayInSeconds = 0.3;
                 dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
                 dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
                     [self setDurationSliderMaxMinValues];
@@ -254,7 +254,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
                             _style = ALMoviePlayerControlsStyleDefault;
                         }
                     }];
-                    
+
                 });
             } else {
                 if (flag) {
@@ -262,14 +262,14 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
                     _style = ALMoviePlayerControlsStyleDefault;
                 }
             }
-        }];
+        } animated:YES];
     }
 }
 
 - (void)setState:(ALMoviePlayerControlsState)state {
     if (_state != state) {
         _state = state;
-        
+
         switch (state) {
             case ALMoviePlayerControlsStateLoading:
                 [self showLoadingIndicators];
@@ -414,7 +414,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.moviePlayer.currentPlaybackRate = 1.f;
     }
     [self.moviePlayer setFullscreen:!self.moviePlayer.isFullscreen animated:YES];
-    [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
 }
 
 - (void)seekForwardPressed:(UIButton *)button {
@@ -485,7 +484,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         case MPMoviePlaybackStatePlaying:
             self.playPauseButton.selected = NO;
             [self startDurationTimer];
-            
+
             //local file
             if ([self.moviePlayer.contentURL.scheme isEqualToString:@"file"]) {
                 [self setDurationSliderMaxMinValues];
@@ -556,9 +555,13 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)hideControls:(void(^)(void))completion {
+    [self hideControls:completion animated:YES];
+}
+
+- (void)hideControls:(void(^)(void))completion animated:(BOOL)animated{
     if (self.isShowing) {
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls:) object:nil];
-        [UIView animateWithDuration:0.3 delay:0.0 options:0 animations:^{
+        [UIView animateWithDuration:animated ? 0.3 : 0.0 delay:0.0 options:0 animations:^{
             if (self.style == ALMoviePlayerControlsStyleFullscreen || (self.style == ALMoviePlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {
                 self.topBar.alpha = 0.f;
             }

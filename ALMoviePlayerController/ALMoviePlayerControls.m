@@ -63,7 +63,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 @property (nonatomic, strong) UILabel *timeRemainingLabel;
 @property (nonatomic, strong) ALButton *seekForwardButton;
 @property (nonatomic, strong) ALButton *seekBackwardButton;
-@property (nonatomic, strong) ALButton *scaleButton;
 
 @end
 
@@ -155,20 +154,12 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         [_topBar addSubview:_timeRemainingLabel];
         
         _fullscreenButton = [[ALButton alloc] init];
-        [_fullscreenButton setTitle:@"Done" forState:UIControlStateNormal];
-        [_fullscreenButton setTitleShadowColor:[UIColor blackColor] forState:UIControlStateNormal];
+      [_fullscreenButton setImage:[UIImage imageNamed:@"movieEndFullscreen.png"] forState:UIControlStateNormal];
         _fullscreenButton.titleLabel.shadowOffset = CGSizeMake(1.f, 1.f);
         [_fullscreenButton.titleLabel setFont:[UIFont systemFontOfSize:14.f]];
         _fullscreenButton.delegate = self;
         [_fullscreenButton addTarget:self action:@selector(fullscreenPressed:) forControlEvents:UIControlEventTouchUpInside];
         [_topBar addSubview:_fullscreenButton];
-        
-        _scaleButton = [[ALButton alloc] init];
-        _scaleButton.delegate = self;
-        [_scaleButton setImage:[UIImage imageNamed:@"movieFullscreen.png"] forState:UIControlStateNormal];
-        [_scaleButton setImage:[UIImage imageNamed:@"movieEndFullscreen.png"] forState:UIControlStateSelected];
-        [_scaleButton addTarget:self action:@selector(scalePressed:) forControlEvents:UIControlEventTouchUpInside];
-        [_topBar addSubview:_scaleButton];
         
         _volumeView = [[MPVolumeView alloc] init];
         [_volumeView setShowsRouteButton:NO];
@@ -239,7 +230,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _fullscreenButton.delegate = nil;
     _seekForwardButton.delegate = nil;
     _seekBackwardButton.delegate = nil;
-    _scaleButton.delegate = nil;
 }
 
 # pragma mark - Setters
@@ -416,11 +406,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     }
     [self.moviePlayer setFullscreen:!self.moviePlayer.isFullscreen animated:YES];
     [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
-}
-
-- (void)scalePressed:(UIButton *)button {
-    button.selected = !button.selected;
-    [self.moviePlayer setScalingMode:button.selected ? MPMovieScalingModeAspectFill : MPMovieScalingModeAspectFit];
 }
 
 - (void)seekForwardPressed:(UIButton *)button {
@@ -657,13 +642,10 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         //top bar
         CGFloat fullscreenWidth = 34.f;
         CGFloat fullscreenHeight = self.barHeight;
-        CGFloat scaleWidth = 28.f;
-        CGFloat scaleHeight = 28.f;
         self.topBar.frame = CGRectMake(0, 0, self.frame.size.width, self.barHeight);
-        self.fullscreenButton.frame = CGRectMake(paddingFromBezel, self.barHeight/2 - fullscreenHeight/2, fullscreenWidth, fullscreenHeight);
-        self.timeElapsedLabel.frame = CGRectMake(self.fullscreenButton.frame.origin.x + self.fullscreenButton.frame.size.width + paddingBetweenButtons, 0, labelWidth, self.barHeight);
-        self.scaleButton.frame = CGRectMake(self.topBar.frame.size.width - paddingFromBezel - scaleWidth, self.barHeight/2 - scaleHeight/2, scaleWidth, scaleHeight);
-        self.timeRemainingLabel.frame = CGRectMake(self.scaleButton.frame.origin.x - paddingBetweenButtons - labelWidth, 0, labelWidth, self.barHeight);
+        self.timeElapsedLabel.frame = CGRectMake(paddingFromBezel, 0, labelWidth, self.barHeight);
+        self.fullscreenButton.frame = CGRectMake(self.topBar.frame.size.width - paddingFromBezel - fullscreenWidth, self.barHeight/2 - fullscreenHeight/2, fullscreenWidth, fullscreenHeight);
+        self.timeRemainingLabel.frame = CGRectMake(self.fullscreenButton.frame.origin.x - paddingBetweenButtons - labelWidth, 0, labelWidth, self.barHeight);
         
         //bottom bar
         self.bottomBar.frame = CGRectMake(0, self.frame.size.height - self.barHeight, self.frame.size.width, self.barHeight);

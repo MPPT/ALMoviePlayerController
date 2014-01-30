@@ -632,7 +632,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         return;
     
     //common sizes
-    CGFloat paddingFromBezel = self.frame.size.width <= iPhoneScreenPortraitWidth ? 10.f : 20.f;
+    CGFloat paddingFromBezel = self.frame.size.width <= iPhoneScreenPortraitWidth ? 10.f : 30.f;
     CGFloat paddingBetweenButtons = self.frame.size.width <= iPhoneScreenPortraitWidth ? 10.f : 30.f;
     CGFloat paddingBetweenPlaybackButtons = self.frame.size.width <= iPhoneScreenPortraitWidth ? 20.f : 30.f;
     CGFloat paddingBetweenLabelsAndSlider = 10.f;

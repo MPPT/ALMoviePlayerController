@@ -130,18 +130,18 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _timeElapsedLabel.backgroundColor = [UIColor clearColor];
     _timeElapsedLabel.font = [UIFont systemFontOfSize:12.f];
     _timeElapsedLabel.textColor = [UIColor lightTextColor];
-    _timeElapsedLabel.textAlignment = NSTextAlignmentRight;
+    _timeElapsedLabel.textAlignment = NSTextAlignmentLeft;
     _timeElapsedLabel.text = @"0:00";
     _timeElapsedLabel.layer.shadowColor = [UIColor blackColor].CGColor;
     _timeElapsedLabel.layer.shadowRadius = 1.f;
     _timeElapsedLabel.layer.shadowOffset = CGSizeMake(1.f, 1.f);
     _timeElapsedLabel.layer.shadowOpacity = 0.8f;
-    
+
     _timeRemainingLabel = [[UILabel alloc] init];
     _timeRemainingLabel.backgroundColor = [UIColor clearColor];
     _timeRemainingLabel.font = [UIFont systemFontOfSize:12.f];
     _timeRemainingLabel.textColor = [UIColor lightTextColor];
-    _timeRemainingLabel.textAlignment = NSTextAlignmentLeft;
+    _timeRemainingLabel.textAlignment = NSTextAlignmentRight;
     _timeRemainingLabel.text = @"0:00";
     _timeRemainingLabel.layer.shadowColor = [UIColor blackColor].CGColor;
     _timeRemainingLabel.layer.shadowRadius = 1.f;

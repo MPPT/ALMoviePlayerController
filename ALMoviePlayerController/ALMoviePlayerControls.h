@@ -93,7 +93,12 @@ typedef enum {
 @property (nonatomic, readonly, getter = isShowing) BOOL showing;
 
 
-/** 
+/**
+ if customActivityIndicator is set, UIActivityIndicatorView will not be used
+*/
+@property (nonatomic, strong) UIView *customActivityIndicator;
+
+/**
  The default initializer method. The parameter may not be nil.
  */
 - (id)initWithMoviePlayer:(ALMoviePlayerController *)moviePlayer style:(ALMoviePlayerControlsStyle)style;

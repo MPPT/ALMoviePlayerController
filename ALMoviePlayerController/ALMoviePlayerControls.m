@@ -575,24 +575,31 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)showLoadingIndicators {
-    [self addSubview:_activityBackgroundView];
-    [self addSubview:_activityIndicator];
-    [_activityIndicator startAnimating];
-    
-    [UIView animateWithDuration:0.2f animations:^{
+    if (_customActivityIndicator) {
+      [self addSubview:_customActivityIndicator];
+    } else {
+      [self addSubview:_activityBackgroundView];
+      [self addSubview:_activityIndicator];
+      [_activityIndicator startAnimating];
+      [UIView animateWithDuration:0.2f animations:^{
         _activityBackgroundView.alpha = 1.f;
         _activityIndicator.alpha = 1.f;
-    }];
+      }];
+    }
 }
 
 - (void)hideLoadingIndicators {
-    [UIView animateWithDuration:0.2f delay:0.0 options:0 animations:^{
+    if (_customActivityIndicator) {
+      [self.customActivityIndicator removeFromSuperview];
+    } else {
+      [UIView animateWithDuration:0.2f delay:0.0 options:0 animations:^{
         self.activityBackgroundView.alpha = 0.0f;
         self.activityIndicator.alpha = 0.f;
-    } completion:^(BOOL finished) {
+      } completion:^(BOOL finished) {
         [self.activityBackgroundView removeFromSuperview];
         [self.activityIndicator removeFromSuperview];
-    }];
+      }];
+    }
 }
 
 - (void)setDurationSliderMaxMinValues {
@@ -695,8 +702,14 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     self.durationSlider.frame = CGRectMake(timeElapsedX + self.timeElapsedLabel.frame.size.width + paddingBetweenLabelsAndSlider, self.barHeight/2 - sliderHeight/2, sliderWidth, sliderHeight);
     
     if (self.state == ALMoviePlayerControlsStateLoading) {
-        [_activityBackgroundView setFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
-        [_activityIndicator setFrame:CGRectMake((self.frame.size.width / 2) - (activityIndicatorSize / 2), (self.frame.size.height / 2) - (activityIndicatorSize / 2), activityIndicatorSize, activityIndicatorSize)];
+        UIView * view = nil;
+        if (self.customActivityIndicator) {
+            view = self.customActivityIndicator;
+        } else  {
+            view = _activityIndicator;
+            [_activityBackgroundView setFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
+        }
+        [view setFrame:CGRectMake((self.frame.size.width / 2) - (activityIndicatorSize / 2), (self.frame.size.height / 2) - (activityIndicatorSize / 2), activityIndicatorSize, activityIndicatorSize)];
     }
 }
 

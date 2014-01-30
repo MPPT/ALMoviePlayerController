@@ -645,7 +645,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     CGFloat airplayHeight = 22.f;
     CGFloat playWidth = 18.f;
     CGFloat playHeight = 22.f;
-    CGFloat labelWidth = 30.f;
+    CGFloat labelWidth = 40.f;
     
     if (self.style == ALMoviePlayerControlsStyleFullscreen || (self.style == ALMoviePlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {
         //top bar

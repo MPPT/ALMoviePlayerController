@@ -632,7 +632,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         return;
     
     //common sizes
-    CGFloat paddingFromBezel = self.frame.size.width <= iPhoneScreenPortraitWidth ? 10.f : 30.f;
+    CGFloat paddingFromBezel = self.frame.size.width <= iPhoneScreenPortraitWidth ? 10.f : 20.f;
     CGFloat paddingBetweenButtons = self.frame.size.width <= iPhoneScreenPortraitWidth ? 10.f : 30.f;
     CGFloat paddingBetweenPlaybackButtons = self.frame.size.width <= iPhoneScreenPortraitWidth ? 20.f : 30.f;
     CGFloat paddingBetweenLabelsAndSlider = 10.f;
@@ -642,9 +642,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     CGFloat seekWidth = 36.f;
     CGFloat seekHeight = 20.f;
     CGFloat airplayWidth = 30.f;
-    CGFloat airplayHeight = 22.f;
-    CGFloat playWidth = 18.f;
-    CGFloat playHeight = 22.f;
+    CGFloat airplayHeight = 30.f;
+    CGFloat playWidth = 60.f;
+    CGFloat playHeight = 50.f;
     CGFloat labelWidth = 40.f;
     
     if (self.style == ALMoviePlayerControlsStyleFullscreen || (self.style == ALMoviePlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {

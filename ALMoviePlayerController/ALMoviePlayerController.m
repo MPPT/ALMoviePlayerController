@@ -258,5 +258,10 @@ static const NSTimeInterval fullscreenAnimationDuration = 0.3;
         }
     }
 }
+- (BOOL)preferStatusBarHidden
+{
+  return YES;
+}
+
 
 @end
